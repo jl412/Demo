@@ -1,0 +1,305 @@
+var currentPage = '';
+var currentImage = 0;
+var currentAper = 3;
+var imageSets = [];
+var isMobile = false;
+var loading = false;
+
+function setGrid(){
+   var showGrid = $('#view');
+
+   $.getJSON('data/asset.json', function(data){
+
+
+    console.log(data);
+
+
+    var content = '';
+
+
+    for (var i = 0; i < data.items.length; i++) {
+
+        nonOddX = data.items[i].interval.x / data.items[i].res.width;
+        oddGridX = 1 - nonOddX * (data.items[i].grid.x -1);
+        nonOddY = data.items[i].interval.y / data.items[i].res.height;
+        oddGridY = 1 - nonOddY * (data.items[i].grid.y -1);
+
+
+        imageSets[i] = {
+            value: i, hashname: data.items[i].hashname, 
+            asset: data.items[i].assets, 
+            orient: data.items[i].orient, 
+            origin: data.items[i].origin, 
+            interval:data.items[i].interval, 
+            aperture: data.items[i].aperture, 
+            xPercent: nonOddX * 100, 
+            xOdd: oddGridX * 100, 
+            yPercent: nonOddY * 100, 
+            yOdd: oddGridY * 100,
+            url: data.items[i].assets + data.items[i].hashname + data.items[i].origin.x + '_' + data.items[i].origin.y + '_'
+            };
+
+        content+= 
+            '<div class="img-wrapper nodisplay"><img class="img-responsive current"src="'+ imageSets[i].url + currentAper + '.jpg"/><div class="grid-container">' + 
+            createRow(data.items[i].grid.y, data.items[i].grid.x, imageSets[i].xPercent, imageSets[i].xOdd, imageSets[i].yPercent, imageSets[i].yOdd) + 
+            '<img class="focus nodisplay" src="img/focus.png"/></div></div>';
+
+    }
+
+    if (content.length) {
+        showGrid.prepend(content);
+    }
+
+    setRefocusEvent();
+    setFocusAnimation();
+
+    // clicking events
+    
+
+
+
+    });
+}
+
+function setRefocusEvent(){
+    $(".grid-container .grid").on("click", function(){
+        console.log("loading:" + loading);
+        if (!loading) {
+            changeFocus(imageSets[currentImage], $(this));
+        }
+    });
+}
+
+function setFocusAnimation(){
+    $('.grid-container').on('click', function(event) {
+        console.log("loading-animation:" + loading);
+
+        if (!loading) {
+            $(this).find(".focus").stop(true, true);
+            var posX = event.pageX - $(this).offset().left - 30,
+            posY = event.pageY - $(this).offset().top - 30;
+            $(this).find(".focus").css({left: posX + "px", top: posY + "px"});
+            $(this).find(".focus").show("explode", {pieces: 4} ,150, function(){
+                loading = true;
+                console.log("show focus");
+            });
+            $(this).find(".focus").delay(200).effect("pulsate",{times: 1}, 500);
+        }
+        
+
+    });
+}
+
+function createRow(row, col, xP, xPLast, yP, yPLast){
+    var temprow = '';
+    for (var i = 0; i < row; i++) {
+        if (i + 1 == row) {
+            temprow += '<div class="row" style="height: '+ yPLast + '%;"  value=' + i + '>' + createCol(col, xP, xPLast) + '</div>';
+        }else{
+            temprow += '<div class="row" style="height: '+ yP +'%;"  value=' + i + '>' + createCol(col, xP, xPLast) + '</div>';
+        }
+    }
+    return temprow;
+}
+
+function createCol(col, xP, xPLast){
+    var tempcol = '';
+    for (var i = 0; i < col; i++) {
+        if (i + 1 == col) {
+            tempcol += '<div class="grid" style="width: '+ xPLast +'%;" value=' + i + '></div>'
+        }else{
+            tempcol += '<div class="grid" style="width: '+ xP +'%;" value=' + i + '></div>'
+        }
+    }
+    return tempcol;
+}
+
+function moveImage(imgValue){
+    loading = true;
+    console.log("currentImg: " + currentImage + " , movetoImg: " + imgValue);
+    if (imgValue < currentImage) {
+        $('.img-wrapper:eq('+ currentImage +')').hide("slide", {direction: "right"}, 300);
+        $('.img-wrapper:eq('+ imgValue +')').show("slide", {direction: "left"}, 300, function(){
+            currentImage = imgValue;
+            sizeGrid();
+            changeAperture(imageSets[currentImage], $( ".aperture" ).slider("value"));
+        });
+        $('.item:eq('+ currentImage +')').parent().removeClass("chosen");
+        $('.item:eq('+ imgValue +')').parent().addClass("chosen");
+    }else if (imgValue > currentImage) {
+        $('.img-wrapper:eq('+ currentImage +')').hide("slide", {direction: "left"}, 300);
+        $('.img-wrapper:eq('+ imgValue +')').show("slide", {direction: "right"}, 300, function(){
+            currentImage = imgValue;
+            sizeGrid();
+            changeAperture(imageSets[currentImage], $( ".aperture" ).slider("value"));
+        });
+        $('.item:eq('+ currentImage +')').parent().removeClass("chosen");
+        $('.item:eq('+ imgValue +')').parent().addClass("chosen");
+    }
+
+}
+
+function changeFocus(imageset, grid){
+
+    var url = 
+        imageset.asset + imageset.hashname +
+        (parseInt(imageset.origin.x) + (parseInt(imageset.interval.x) * $(grid).attr("value"))) + '_' + 
+        (parseInt(imageset.origin.y) + (parseInt(imageset.interval.y) * $(grid.parent()).attr("value"))) + '_'; 
+        
+    console.log("x-index: " + $(grid).attr("value") + ", y-index: " + $(grid.parent()).attr("value"));
+
+    imageset.url = url;
+    console.log(imageSets[currentImage].url + currentAper);
+
+
+    $("#view .img-wrapper:eq("+ currentImage +")").prepend('<img class="img-responsive onload"src="'+ url + currentAper + '.jpg' +'"/>');
+    // $(".img-wrapper:eq("+ currentImage +") .grid-container").addClass("wait");
+    $(".img-wrapper:eq("+ currentImage +") .grid-container").trigger('mousemove');
+    replaceImg(true);
+}
+
+function changeAperture(imageset, aperture){
+
+    var converted = imageset.aperture.start +  Math.round(aperture /  (100 / imageset.aperture.scale)) * imageset.aperture.interval;
+    console.log(converted);
+
+    currentAper = converted;
+
+    $("#view .img-wrapper:eq("+ currentImage +")").prepend('<img class="img-responsive onload"src="'+ imageset.url + converted + '.jpg' +'"/>');
+
+
+    replaceImg(false);
+}
+
+
+function replaceImg(focusAnimation){
+    var inserted =  $(".img-wrapper:eq("+ currentImage +") .onload");
+    inserted.on("load", function(){
+        $(".img-wrapper:eq("+ currentImage +") .current").not(inserted).hide("fade", 300 , function(){
+            $(this).detach();
+            inserted.removeClass("onload").addClass("current");
+            if (focusAnimation == true) {
+                $(".img-wrapper:eq("+ currentImage +")").find(".focus").delay(300).hide("fade", 10, function(){
+                    loading = false;
+                    console.log("hide focus");
+                });
+            }   
+        })
+    });
+}
+
+function sizeGrid(){
+    $('#view .img-wrapper:eq(' + currentImage +')').find(".grid-container").css({width: $("#view .img-wrapper:eq("+ currentImage +")").find(".current").width() + "px", height:$("#view .img-wrapper:eq("+ currentImage +")").find("img").height() + "px"});
+    console.log($("#view .img-wrapper:eq("+ currentImage +")").find("img").width());
+
+    $( ".aperture" ).slider( "option", "step", (100 / imageSets[currentImage].aperture.scale));
+    loading = false;
+}
+
+
+
+function render(url){
+    // console.log("render");
+    // console.log("url:" + url);
+    var temp = url.split('/')[0];
+}
+
+function modDecrease(dividend, divisor){
+  if ((dividend - 1) < 0) {
+    return dividend - 1 + divisor;
+  }else{
+    return dividend -1;
+  }
+}
+
+function checkMobile(){
+    if ($("#view").css("position") == "relative") {
+        isMobile = true;
+    }
+}
+    
+
+$(window).on('hashchange', function(){
+    // On every hash change the render function is called with the new hash.
+    // This is how the navigation of our app happens.
+    render(decodeURI(window.location.hash));    
+});
+
+$(window).trigger('hashchange');
+
+
+$(".item").click(function(){
+
+    if (currentPage == "#view") {
+        moveImage($(this).attr("value"));
+    }else{
+        $('.img-wrapper:eq('+ $(this).attr("value") +')').show();
+        $(".item").parent().removeClass("chosen");
+        $(this).parent().addClass("chosen");
+        currentImage = $(this).attr("value");
+    }
+    window.location.hash = "#view"; 
+});
+
+
+$(".next").click(function(){
+    moveImage((currentImage + 1) % imageSets.length);
+});
+
+$(".prev").click(function(){
+    moveImage(modDecrease(currentImage, imageSets.length));
+});
+
+
+$(".close").click(function(){
+    window.location.hash = "#home";
+});
+
+$(".area").mouseenter(function(){
+    $(this).addClass("focus");
+    $(".area").not(this).addClass("shrink");
+});
+
+$(".area").mouseleave(function(){
+    $(this).removeClass("focus");
+    $(".area").not(this).removeClass("shrink");
+});
+
+$("#enhance .leftHalf").mouseenter(function(){
+    $("#enhance").addClass("hoverLeft");
+}).mouseleave(function(){
+    $("#enhance").removeClass("hoverLeft");
+});
+
+
+
+setGrid();
+checkMobile();
+
+// showImg();
+$(window).load(function(){
+    $('.loading.initial').hide("fade", 1500);
+});
+
+$(window).resize(function(){
+    checkMobile();
+})
+
+
+$(document).on('ready', function(){ 
+    $('#fullpage').fullpage();
+});
+
+$(".tip").on('click', function(){
+    $(this).hide("fade", 300);
+});
+
+$("#view").on('mousewheel', function(event) {
+    var currentVal = $( ".aperture" ).slider("value");
+    if (event.originalEvent.wheelDelta >= 0) {
+        $( ".aperture" ).slider("value", currentVal + (100 / imageSets[currentImage].aperture.scale));
+    }
+    else {
+        $( ".aperture" ).slider("value", currentVal - (100 / imageSets[currentImage].aperture.scale));
+    }
+});
