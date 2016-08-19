@@ -245,7 +245,7 @@ body > .hori-layout{
 	right: 15px;
 }
 
-.close{
+.                                                                                                                                                                                                                      {
 	position: absolute;
     top: 15px;
     line-height: 30px;
@@ -264,6 +264,10 @@ body > .hori-layout{
 .close:hover, .prev:hover, .next:hover{
 	color: #fff;
     opacity: 1;
+}
+
+.close{
+	color: #fff;
 }
 
 .img-wrapper{

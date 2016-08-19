@@ -251,24 +251,37 @@ $(".prev").click(function(){
 });
 
 
-$(".close").click(function(){
-    window.location.hash = "#home";
+$(".close").click(function(event){
+    event.stopPropagation();
+    console.log("close");
+    $(".area").each(function(){
+        $(this).removeClass("opened").removeClass("nonopened");
+    });
+});
+
+
+$(".area").click(function(){
+    console.log("open");
+    $(this).removeClass("nonopened").addClass("opened");
+    $(".area").not(this).removeClass("opened").addClass("nonopened");
 });
 
 $(".area").mouseenter(function(){
     $(this).addClass("focus");
     $(".area").not(this).addClass("shrink");
+    $(this).find(".background-a").hide("fade", 300);
 });
 
 $(".area").mouseleave(function(){
     $(this).removeClass("focus");
     $(".area").not(this).removeClass("shrink");
+    $(this).find(".background-a").show("fade", 300);
 });
 
 $("#enhance .leftHalf").mouseenter(function(){
-    $("#enhance").addClass("hoverLeft");
+    $("#enhance .background-b").addClass("hoverLeft");
 }).mouseleave(function(){
-    $("#enhance").removeClass("hoverLeft");
+    $("#enhance .background-b").removeClass("hoverLeft");
 });
 
 

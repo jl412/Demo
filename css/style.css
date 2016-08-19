@@ -40,56 +40,78 @@ a{
 	margin: 0;
 	padding: 0;
 	transition: .5s;
-	background-size: cover;
 	position: relative;
 }
 
 .area.focus{
-	width: 28%;aa
+	width: 40%;
 }
 
 .area.shrink{
-	width: 18%;
+	width: 15%;
 }
 
-#threeD{
+.area.opened{
+	width: 80%
+}
+
+.area.nonopened{
+	width: 5%
+}
+
+.background-b, .background-a{
+	z-index: -1;
+	position: absolute;
+	background-size: cover;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	right: 0;
+}
+
+#threeD .background-a{
 	background-position: center;
 	background-image: url(../img/20160221_161910_937_687_15.jpg);
 }
 
-#threeD:hover{
+#threeD .background-b{
+	background-position: center;
 	background-image: url(../img/20160221_161910_62_562_7.jpg);
 }
 
-#makeup{
+#makeup .background-a{
 	background-position: center;
 	background-image: url(../img/makeup-1.jpg);
 }
 
-#makeup:hover{
+#makeup .background-b{
+	background-position: center;
 	background-image: url(../img/makeup-2.jpg);
 }
 
-#filter{
+#filter .background-a{
 	background-position: center;
 	background-image: url(../img/filter_b.jpg);
 }
 
-#filter:hover{
+#filter .background-b{
+	background-position: center;
 	background-image: url(../img/filter.jpg);
 }
 
-#art{
+#art .background-a{
 	background-position: center;
 	background-image: url(../img/Gallery_a.jpg);
 }
 
-#art:hover{
+#art .background-b{
+	background-position: center;
 	background-image: url(../img/Gallery_b.jpg);
 }
 
 
-#enhance{
+#enhance .background-a{
 	background-position: center;
 	background-image: url(../img/beijing03.jpg);
 }
@@ -100,11 +122,12 @@ a{
 	width: 50%;
 }
 
-#enhance:hover{
+#enhance .background-b{
+	background-position: center;
 	background-image: url(../img/beijing03a.jpg);
 }
 
-#enhance.hoverLeft{
+#enhance .background-b.hoverLeft{
 	background-image: url(../img/beijing03b.jpg);
 }
 
@@ -126,7 +149,7 @@ a{
 	opacity: 0.7;
 	height: 1.8em;
 	width: 0;
-	transition: .5s;
+	transition: .5s;	
 }
 
 .area:hover .area-headline{
@@ -134,18 +157,22 @@ a{
 }
 
 
+
 #threeD .area-headline, #threeD .area-textholder{
 	top: 10%;
+	bottom: auto;
 	left: 0;
 }
 
 #makeup .area-headline, #makeup .area-textholder{
+	top: auto;
 	bottom: 14%;
 	right: 0;
 }
 
 #filter .area-headline, #filter .area-textholder{
 	top: 24%;
+	bottom: auto;
 	right: 0;
 }
 
@@ -154,6 +181,7 @@ a{
 }
 
 #art .area-headline, #art .area-textholder{
+	top: auto;
 	bottom: 4%;
 	right: 0;
 }
@@ -167,33 +195,81 @@ a{
 	left: 5em;
 }
 
-#threeD:hover .area-textholder{
+#threeD:hover .area-textholder,
+#threeD.opened .area-textholder{
 	width: 9em;
 }
 
-#makeup:hover .area-textholder{
+#makeup:hover .area-textholder,
+#makeup.opened .area-textholder{
 	width: 8em;
 }
 
-#filter:hover .area-textholder{
+#filter:hover .area-textholder,
+#filter.opened .area-textholder{
 	width: 10em;
 }
 
-#art:hover .area-textholder{
+#art:hover .area-textholder,
+#art.opened .area-textholder{
 	width: 10em;
 }
 
-#enhance:hover .area-textholder{
+#enhance:hover .area-textholder,	
+#enhance.opened .area-textholder{
 	width: 13em;
 }
 
 
 
+.area.nonopened .area-headline, 
+.area.nonopened .area-textholder,
+.area.nonopened:hover .area-headline, 
+.area.nonopened:hover .area-textholder{
+	left: auto;
+	right: auto;
+}
+
+.area.nonopened .area-textholder,
+.area.nonopened:hover .area-textholder{
+	top: 0 !important;
+	height: 100% !important;
+	bottom: 0 !important;
+	left: 0 !important;
+	right: 0!important;
+	width: 100%!important;
+}
+
+
+.area.nonopened .area-headline, 
+.area.nonopened:hover .area-headline{
+	bottom: auto !important;
+	left: auto !important;
+	right: auto !important;
+	top: 50% !important;
+	-ms-transform: rotate(90deg) translateY(-50%); 
+   	-webkit-transform: rotate(90deg) translateY(-50%); 
+    transform: rotate(90deg);
+    -ms-transform-origin: 50% 50%;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+}
+
+
+.area.opened .area-headline{
+	opacity: 1 !important;
+	top: 30px !important;
+}
+
+.area.opened .area-textholder{
+	top: 0 !important;
+	bottom: 0 !important;
+	height: 100% !important;
+}
 
 
 
-
-
+	
 .slogan{
 	text-align: center;
 	margin-bottom: 100px;
@@ -236,6 +312,34 @@ a{
     -webkit-transition-timing-function: ease;
     transition-timing-function: ease;
 }
+
+
+.close {
+	display: none;
+    position: absolute;
+    top: 15px;
+    line-height: 30px;
+    text-shadow: 0 0 2px #000;
+    color: #fff;
+    opacity: .5;
+    padding: 15px;
+    right: 15px;
+    left: auto;
+    margin: -15px;
+    font-size: 24px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.close:hover{
+	color: #fff;
+    opacity: .8;
+}
+
+.area.opened .close{
+	display: block;
+}
+
 
 .temp-transition{
 	transition: .3s;
@@ -461,50 +565,7 @@ li:hover .menu-underline{
 	background: rgba(0,0,0, 0.4) ;
 }
 
-.dz-message{
-	text-align: center;
-	margin-top: 0 !important;
-	position: relative;
-	top: 50%;
-	-ms-transform: translateY(-50%); /* IE 9 */
-   	-webkit-transform: translateY(-50%); /* Safari */
-    transform: translateY(-50%); 
-}
 
-.dz-message span{
-	color: #fff !important;
-	font-size: 14px !important;
-}
-
-.dz-message > span > div{
-	margin-top: 15px;
-}
-
-.dz-preview{
-	position: relative;
-	top: 50%;
-	-ms-transform: translateY(-50%); /* IE 9 */
-   	-webkit-transform: translateY(-50%); /* Safari */
-    transform: translateY(-50%);  
-}
-
-.dz-max-files-reached {
-          pointer-events: none;
-          cursor: default;
-}
-
-.dz-max-files-reached:hover {
-    border: 3px dashed #fff !important;
-	-webkit-transition: border 2s, background 0.5s !important;
-    transition: border 2s, background 0.5s !important;
-    background: transparent; 
-}
-
-
-.dz-preview { 
-	pointer-events: all; 
-	cursor: pointer !important;
-}
 
 .browse-btn{
 	padding: 7px;
@@ -614,40 +675,6 @@ li:hover .menu-underline{
 	padding: 20px;
 	margin-right: auto;
 	margin-left: auto;
-}
-
-.style-item > p {
-	text-align: center;
-	white-space: nowrap; 
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.style-thumbnail{
-	height: 180px;
-	width: 100%;
-	background-size: cover;
-}
-
-.dz-message > .style-thumbnail{
-	position: relative;
-	height: initial;
-	width: 50%;
-	background-size: cover;
-}
-
-.dz-message > .style-thumbnail:before{
-	content: "";
-	display: block;
-	padding-top: 100%; 	/* initial ratio of 1:1*/
-}
-
-.dz-message > .style-thumbnail > div{
-	position:  absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
 }
 
 
